@@ -1,0 +1,113 @@
+Parsing of Large Negative Integer Constants
+===========================================
+
+The parsing of MIN_INT / MIN_LLONG  is tricky because, according to the SnuPL/2 grammar,  the minus (-) in front 
+of a constant is not part of the number but a separate grammar element. This leads to problems when checking for 
+integer bounds.
+
+
+
+Strict implementation of SnuPL/2 EBNF
+-------------------------------------
+A strict implementation does not perform folding of negation and constants. Since 'number' accepts only positive 
+numbers, there is no way to directly represent MIN_INT.
+
+
+This is implemented by the file test_semanal.strict
+
+If you choose to implement this variant, test your compiler with test/semanal/int_const_strict.mod
+
+
+
+Simple constant folding
+-----------------------
+As a simple workaround to allow MIN_INT, we can fold the negation operator with the constant 'term'.
+
+This is a slighly inaccurate interpretation of the SnuPL/2 grammar. If a constant follows the initial sign of a 
+simplexpr, we perform folding of the negation and the constant iff the term follwing the +/- sign is a constant. 
+This leads to unintuitive behavior since -MIN_INT + ... is accepted, but -MIN_INT * ... is not.
+
+To understand why consider the parse trees
+
+    -2147483648 + 5                  -2147483648 * 5
+
+      simpleexpr                       simpleexpr
+     /  |    |  \                        /   \
+   "-" term "+" term                   "-"   term
+        |        |                          /  |  \
+      factor   factor                 factor  "*"  factor
+        |        |                      |             |
+      number   number                 number       number
+        |        |                      |             |
+   2147483648    5                 2147483648         5
+
+In the left case, the first term is represented by an CAstConstant node which can be easily folded with the "-" 
+sign on its left. For the multiplication, the (first) term is of type CAstBinaryOp and can thus not be folded 
+anymore.
+
+      simpleexpr                       simpleexpr
+     /  |    |  \                        /   \
+   "-" term "+" term                   "-"  term
+    (of type)  (of type)                  (of type)
+ CAstConstant CAstConstant               CAstBinaryOp
+                                        /     |     \
+     ^                               factor  "*"  factor
+     |                              (of type)    (of type)
+ fold "-" w/ CAstConstant         CAstConstant  CAstConstant
+
+
+This is implemented by the file test_semanal.simple
+
+If you choose this implementation, test your compiler with test/semanal/int_const_simple.mod
+
+
+
+Relaxed constant folding
+------------------------
+This variant folds the negation operator with an immediately following constant.
+
+Relaxed constant folding improves the unintuitive behavior of simple constant folding by also folding an
+integer constant if it appears as the leftmost leaf in the 'term' expression following the inital sign in 
+'simpleexpr'. I.e., for the parse trees
+
+    -2147483648 + 5                  -2147483648 * 5
+
+      simpleexpr                       simpleexpr
+     /  |    |  \                        /   \
+   "-" term "+" term                   "-"   term
+        |        |                          /  |  \
+      factor   factor                 factor  "*"  factor
+        |        |                      |             |
+      number   number                 number       number
+        |        |                      |             |
+   2147483648    5                 2147483648         5
+
+
+we first identify the leftmost leaf in the first term and fold if it is a CAstConstant:
+
+      simpleexpr                       simpleexpr
+     /  |    |  \                        /   \
+   "-" term "+" term                   "-"  term
+    (of type)  (of type)                  (of type)
+ CAstConstant CAstConstant               CAstBinaryOp
+     ^                                  /     |     \
+     |                               factor  "*"  factor
+ fold "-" w/ CAstConstant          (of type)    (of type)
+                                  CAstConstant  CAstConstant
+                                      ^
+                                      |
+                                  fold "-" w/ CAstConstant
+
+This approach requires modifications to the AST data structure since we need to know whether an expression 
+had been enclosed in parentheses or not. Otherwise we would wrongfully accept expressions such as
+
+    i := -(2147483648 + 5)
+
+or even worse (b is of boolean type here)
+
+    b := -(1 > 0)
+
+
+This is implemented by the file test_semanal.relaxed
+
+A test program for this variant is provided in test/semanal/int_const_relaxed.mod

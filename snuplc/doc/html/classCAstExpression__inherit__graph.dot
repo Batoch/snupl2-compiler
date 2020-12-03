@@ -1,0 +1,28 @@
+digraph "CAstExpression"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node0 [label="CAstExpression",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node1 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 [label="CAstNode",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstNode.html",tooltip="AST base node. "];
+  Node0 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="CAstFunctionCall",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstFunctionCall.html",tooltip="AST function call node. "];
+  Node0 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="CAstOperand",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstOperand.html",tooltip="AST operand node. "];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="CAstConstant",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstConstant.html",tooltip="AST constant operand node. "];
+  Node3 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="CAstDesignator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstDesignator.html",tooltip="AST designator. "];
+  Node5 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="CAstArrayDesignator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstArrayDesignator.html",tooltip="AST array designator. "];
+  Node3 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="CAstStringConstant",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstStringConstant.html",tooltip="AST string constant operand node. "];
+  Node0 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="CAstOperation",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstOperation.html",tooltip="AST operation node. "];
+  Node8 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="CAstBinaryOp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstBinaryOp.html",tooltip="AST binary operation node. "];
+  Node8 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="CAstSpecialOp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstSpecialOp.html",tooltip="AST special operation node. "];
+  Node8 -> Node11 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="CAstUnaryOp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classCAstUnaryOp.html",tooltip="AST unary operation node. "];
+}

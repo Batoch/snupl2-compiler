@@ -1,0 +1,26 @@
+digraph "src/scanner.h"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node5 [label="src/scanner.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node5 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="src/ast.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ast_8h.html"];
+  Node6 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="src/ast.cpp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ast_8cpp.html"];
+  Node6 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="src/ir.cpp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$ir_8cpp.html"];
+  Node6 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="src/parser.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$parser_8h.html"];
+  Node9 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="src/parser.cpp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$parser_8cpp.html"];
+  Node9 -> Node11 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="src/test_parser.cpp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$test__parser_8cpp.html"];
+  Node5 -> Node12 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="src/data.cpp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$data_8cpp.html"];
+  Node5 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 -> Node13 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 [label="src/scanner.cpp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$scanner_8cpp.html"];
+  Node5 -> Node11 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 -> Node14 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node14 [label="src/test_scanner.cpp",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$test__scanner_8cpp.html"];
+}

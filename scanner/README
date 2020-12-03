@@ -1,0 +1,17 @@
+This directory contains the reference implementation of the SnuPL/2 scanner (scanner.o)
+
+To use this scanner instead of your own, perform the following steps:
+
+1. create a directory 'lib' under 'snuplc'
+   $ mkdir ../snuplc/lib
+
+2. copy scanner.o to the newly created directory
+   $ cp scanner.o ../snuplc/lib/
+
+3. copy scanner.h to the source directory
+   $ cp scanner.h ../snuplc/src/
+
+4. replace the Makefile in snuplc/ with Makefile.lib in this directory
+   $ cp Makefile.lib ../snuplc/Makefile
+
+
