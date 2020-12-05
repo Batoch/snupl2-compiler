@@ -551,7 +551,7 @@ CTacAddr* CAstStatCall::ToTac(CCodeBlock *cb, CTacLabel *next)
 	int nbarg = _call->GetNArgs() - 1;
 
 	// Tac for every arg
-	for (int i = nbarg; i>=0; i++){
+	for (int i = nbarg; i>=0; i--){
 		CTacAddr *tacArg = _call->GetArg(i)->ToTac(cb);
 		cb->AddInstr(new CTacInstr(opParam, new CTacConst(i, GetType()), tacArg, nullptr));
 	}
@@ -1603,6 +1603,9 @@ unsigned int CAstFunctionCall::GetNArgs(void) const
 
 CAstExpression* CAstFunctionCall::GetArg(unsigned int index) const
 {
+	assert((index >= 0));
+
+	assert((index < _arg.size()));
 	assert((index >= 0) && (index < _arg.size()));
 	return _arg[index];
 }
