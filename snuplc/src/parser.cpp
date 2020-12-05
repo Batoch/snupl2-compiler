@@ -159,9 +159,9 @@ CAstModule* CParser::module()
 	CAstModule* m;
 	CAstStatement* statseq = NULL;
 
-	while(_scanner->Peek().GetType() == tUndefined){
-		Consume(tUndefined, &mt);
-	}
+//	while(_scanner->Peek().GetType() == tUndefined){
+//		Consume(tUndefined, &mt);
+//	}
 
 	Consume(tModule, &mt);
 	Consume(tIdent, &mt);
