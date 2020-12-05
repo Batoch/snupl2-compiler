@@ -1043,7 +1043,7 @@ bool CAstBinaryOp::TypeCheck(CToken *t, string *msg) const
 	if (!rightTerm->TypeCheck(t, msg))
 		return false;
 
-	if (!leftTerm->GetType() || !leftTerm->GetType()->IsScalar() || !leftTerm->GetType()->IsPointer())
+	if (!leftTerm->GetType() || !leftTerm->GetType()->IsScalar() || leftTerm->GetType()->IsPointer())
 	{
 		if (t != NULL)
 			*t = leftTerm->GetToken();
@@ -1052,7 +1052,7 @@ bool CAstBinaryOp::TypeCheck(CToken *t, string *msg) const
 		return false;
 	}
 
-	if (!rightTerm->GetType() || !rightTerm->GetType()->IsScalar() || !rightTerm->GetType()->IsPointer())
+	if (!rightTerm->GetType() || !rightTerm->GetType()->IsScalar() || rightTerm->GetType()->IsPointer())
 	{
 		if (t != NULL)
 			*t = rightTerm->GetToken();
