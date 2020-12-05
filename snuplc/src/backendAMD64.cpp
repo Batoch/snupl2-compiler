@@ -469,13 +469,34 @@ string CBackendAMD64::Location(const CSymbol *s, long long ofs)
 
 string CBackendAMD64::Reg(EAMD64Register reg, int size)
 {
-  //
-  // TODO
-  // return the full register name for base register @a base and a given data @a size
-  // Hint: this is a simple lookup into EAMD64RegisterName
-  //
-  return "%?";
+	//
+	// return the full register name for base register @a base and a given data @a size
+	// Hint: this is a simple lookup into EAMD64RegisterName
+	//
+
+	switch (size)
+	{
+	case 8:
+	{
+		return EAMD64RegisterName[reg].n8;
+	}
+	case 16:
+	{
+		return EAMD64RegisterName[reg].n16;
+	}
+	case 32:
+	{
+		return EAMD64RegisterName[reg].n32;
+	}
+	case 64:
+	{
+		return EAMD64RegisterName[reg].n64;
+	}
+	default:
+		return "%?";
+	}
 }
+
 
 void CBackendAMD64::ComputeStackOffsets(CScope *scope, StackFrame &paf)
 {
