@@ -140,7 +140,7 @@ class CBackendAMD64 : public CBackend {
     string Operand(const CTac *op);
 
     /// @brief return an immediate for @a value
-    string Imm(int value) const;
+    string Imm(long long value) const;
 
     /// @brief return a x86-label for CTaclabel @a label
     string Label(const CTacLabel *label) const;

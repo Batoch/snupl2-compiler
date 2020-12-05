@@ -416,7 +416,7 @@ string CBackendAMD64::Operand(const CTac *op)
   return "?";
 }
 
-string CBackendAMD64::Imm(int value) const
+string CBackendAMD64::Imm(long long value) const
 {
   ostringstream o;
   o << "$" << dec << value;
