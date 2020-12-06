@@ -116,8 +116,19 @@ void CBackendAMD64::EmitCode(void)
   _out << endl
        << endl;
 
+
   // emit scope & subscopes
   // TODO
+
+	CModule* scope = _m;
+
+	const vector<CScope*> &subscopes = scope->GetSubscopes();
+	for (const auto &scop : subscopes) {
+		SetScope(scop);
+		EmitScope(scop);
+	}
+	SetScope(scope);
+	EmitScope(scope);
 
   _out << _ind << "# end of text section" << endl
        << _ind << "#-----------------------------------------" << endl
@@ -191,16 +202,30 @@ void CBackendAMD64::EmitScope(CScope *scope)
   };
   ComputeStackOffsets(scope, paf);
 
-  // 2. emit function prologue
-  //    - store saved registrs
-  //    - adjust stack pointer to make room for PAF
-  //    - save parameters to stack (not necessary if we do register allocation)
-  //    - set argument build & local variable area to 0
-  //    - initialize local arrays (EmitLocalData)
+  	// 2. emit function prologue
+	_out << _ind << "# prologue" << endl;
 
-  // 3. emit code
+	//    - store saved registrs
+	_out << _ind << "# save callee saved registers" << endl;
+	EmitInstruction("pushq", "%rbx");
+	EmitInstruction("pushq", "%rbp");
+	EmitInstruction("pushq", "%r12");
+	EmitInstruction("pushq", "%r13");
+	EmitInstruction("pushq", "%r14");
+	EmitInstruction("pushq", "%r15");
 
-  // 4. emit function epilogue
+  	//    - adjust stack pointer to make room for PAF
+  	//    - save parameters to stack (not necessary if we do register allocation)
+  	//    - set argument build & local variable area to 0
+
+  	//    - initialize local arrays (EmitLocalData)
+	EmitLocalData(scope);
+	_out << endl;
+
+  	// 3. emit code
+	EmitCodeBlock(scope->GetCodeBlock(), paf);
+
+  	// 4. emit function epilogue
 
   _out << endl;
 }
@@ -318,6 +343,13 @@ void CBackendAMD64::EmitInstruction(CTacInstr *i, StackFrame &paf)
   EOperation op = i->GetOperation();
 
   switch (op) {
+//  	case opDiv:
+//  		EmitInstruction();
+  case opAdd:
+  	//addl/q S, D
+
+  		EmitInstruction("addl", "not implemented");
+	  	break;
     // binary operators
     // dst = src1 op src2
 

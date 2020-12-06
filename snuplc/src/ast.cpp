@@ -1603,9 +1603,6 @@ unsigned int CAstFunctionCall::GetNArgs(void) const
 
 CAstExpression* CAstFunctionCall::GetArg(unsigned int index) const
 {
-	assert((index >= 0));
-
-	assert((index < _arg.size()));
 	assert((index >= 0) && (index < _arg.size()));
 	return _arg[index];
 }
