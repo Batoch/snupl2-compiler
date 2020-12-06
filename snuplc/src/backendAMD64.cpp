@@ -112,6 +112,8 @@ void CBackendAMD64::EmitCode(void)
       }
     }
   }
+	_out << _ind << ".extern " << "DOFS" << endl;
+	_out << _ind << ".extern " << "DIM" << endl;
 
   _out << endl
        << endl;
@@ -202,6 +204,18 @@ void CBackendAMD64::EmitScope(CScope *scope)
   };
   ComputeStackOffsets(scope, paf);
 
+	_out << _ind << "# Stack organization:" << endl;
+	_out << _ind << "# " + _ind + "return_address :   " + to_string(paf.return_address) << endl;
+	_out << _ind << "# " + _ind + "saved_registers :  " + to_string(paf.saved_registers) << endl;
+	_out << _ind << "# " + _ind + "padding :          " + to_string(paf.padding) << endl;
+	_out << _ind << "# " + _ind + "saved_parameters : " + to_string(paf.saved_parameters) << endl;
+	_out << _ind << "# " + _ind + "local_variables :  " + to_string(paf.local_variables) << endl;
+	_out << _ind << "# " + _ind + "argument_build :   " + to_string(paf.argument_build) << endl;
+	_out << _ind << "# " + _ind + "total size :       " + to_string(paf.size) << endl;
+	_out << endl;
+	_out << endl;
+
+
   	// 2. emit function prologue
 	_out << _ind << "# prologue" << endl;
 
@@ -213,6 +227,8 @@ void CBackendAMD64::EmitScope(CScope *scope)
 	EmitInstruction("pushq", "%r13");
 	EmitInstruction("pushq", "%r14");
 	EmitInstruction("pushq", "%r15");
+	EmitInstruction("subq", "$" + to_string(paf.size) + ", %rsp");
+
 
   	//    - adjust stack pointer to make room for PAF
   	//    - save parameters to stack (not necessary if we do register allocation)
@@ -226,8 +242,18 @@ void CBackendAMD64::EmitScope(CScope *scope)
 	EmitCodeBlock(scope->GetCodeBlock(), paf);
 
   	// 4. emit function epilogue
+	_out << _ind << "# epilogue" << endl;
+	EmitInstruction("addq", "$" + to_string(paf.size) + ", %rsp");
+	EmitInstruction("popq", "%r15");
+	EmitInstruction("popq", "%r14");
+	EmitInstruction("popq", "%r13");
+	EmitInstruction("popq", "%r12");
+	EmitInstruction("popq", "%rbp");
+	EmitInstruction("popq", "%rbx");
+	EmitInstruction("ret");
 
-  _out << endl;
+
+  	_out << endl;
 }
 
 void CBackendAMD64::EmitGlobalData(CScope *scope)
@@ -314,12 +340,20 @@ void CBackendAMD64::EmitGlobalData(CScope *scope)
 
 void CBackendAMD64::EmitLocalData(CScope *scope)
 {
-  assert(scope != NULL);
+	// emit the variables for the current scope
+	// TODO
+	assert(scope != NULL);
+	const vector<CSymbol*>& symbols = scope->GetSymbolTable()->GetSymbols();
 
-  //
-  // TODO
-  // emit the variables for the current scope
-  //
+	for (auto symbol : symbols) {
+		const CType* type = symbol->GetDataType();
+
+		if (type->IsArray()){
+			// outch
+		}
+	}
+	_out << dec;
+
 }
 
 void CBackendAMD64::EmitCodeBlock(CCodeBlock *cb, StackFrame &paf)
@@ -334,56 +368,160 @@ void CBackendAMD64::EmitCodeBlock(CCodeBlock *cb, StackFrame &paf)
 
 void CBackendAMD64::EmitInstruction(CTacInstr *i, StackFrame &paf)
 {
-  assert(i != NULL);
+	assert(i != NULL);
 
-  ostringstream cmt;
-  string mnm, mnm2, mnmpf;
-  cmt << i;
+	ostringstream cmt;
+	string mnm, mnm2, mnmpf;
+	cmt << i;
 
-  EOperation op = i->GetOperation();
+	EOperation op = i->GetOperation();
+	EAMD64Register reg;
+	CTacAddr* value;
+	string operation;
 
-  switch (op) {
-//  	case opDiv:
-//  		EmitInstruction();
-  case opAdd:
-  	//addl/q S, D
 
-  		EmitInstruction("addl", "not implemented");
-	  	break;
-    // binary operators
-    // dst = src1 op src2
+  	switch (op) {
+	// binary operators
+	// dst = src1 op src2
+	case opAdd:
+	case opSub:
+	case opMul:
+	case opDiv:
+	case opAnd:
+	case opOr:
+		switch (op)
+		{
+		case opAdd:
+			operation = "addq";
+			break;
+		case opSub:
+			operation = "subq";
+			break;
+		case opMul:
+			operation = "imulq";
+			break;
+		case opDiv:
+			operation = "idivq";
+			break;
+		case opOr:
+			operation = "orq";
+			break;
+		case opAnd:
+			operation = "andq";
+			break;
+		}
+
+		reg = rAX;
+		value = i->GetSrc(1);
+		Load(reg, value, cmt.str());
+		reg = rBX;
+		value = i->GetSrc(2);
+		Load(reg, value);
+
+		if (op == opDiv){
+			EmitInstruction("cltd");
+		}
+		EmitInstruction(operation, "%rbx, %rax");
+
+		reg = rSP;
+		Store(i->GetDest(), reg);
+		break;
 
     // unary operators
     // dst = src1
 
+	case opNeg:
+	case opPos:
+	case opNot:
+		switch (op)
+		{
+		case opNeg:
+			operation = "negq";
+			break;
+		case opNot:
+			operation = "notq";
+			break;
+		}
+
+		reg = rAX;
+		value = i->GetSrc(1);
+		Load(reg, value, cmt.str());
+		EmitInstruction(operation, "%rax");
+
+		Store(i->GetDest(), reg);
+
+		break;
+
     // memory operations
     // dst = src1
-
+	case opAssign:
+		reg = rAX;
+		value = i->GetSrc(1);
+		Load(reg, value, cmt.str());
+		reg = rAX;
+		Store(i->GetDest(), reg);
+		break;
     // pointer operations
     // dst = &src1
     // dst = *src1
 
+	case opAddress:
+	case opDeref:
+	case opCast:
+	case opWiden:
+	case opNarrow:
+		break;
+
     // unconditional branching
     // goto dst
+	case opGoto:
+		EmitInstruction("jmp", Label(dynamic_cast<const CTacLabel*>(i->GetDest())), cmt.str());
+		break;
 
     // conditional branching
     // if src1 relOp src2 then goto dst
+	case opEqual:
+	case opNotEqual:
+	case opLessThan:
+	case opLessEqual:
+	case opBiggerThan:
+	case opBiggerEqual:
+		break;
 
     // function call-related operations
+  	case opCall:
+		EmitInstruction("call",dynamic_cast<const CSymProc*>(dynamic_cast<const CTacName*>(i->GetSrc(1))->GetSymbol())->GetName(), cmt.str());
+		break;
+	case opReturn:
+		if (i->GetSrc(1)){
+			// If we need to return something
+			reg = rAX;
+			value = i->GetSrc(1);
+			Load(reg, value, cmt.str());
+			EmitInstruction("jmp", Label("exit"));
+		}
+		else
+			EmitInstruction("jmp", Label("exit"), cmt.str());
+		break;
+	case opParam:
+		reg = rAX;
+		value = i->GetSrc(1);
+		Load(reg, value, cmt.str());
+		EmitInstruction("pushq", "%rax");
+		break;
 
-    // special
-    case opLabel:
-      _out << Label(dynamic_cast<CTacLabel*>(i)) << ":" << endl;
-      break;
+		// special
+	case opLabel:
+		_out << Label(dynamic_cast<CTacLabel*>(i)) << ":" << endl;
+		break;
 
-    case opNop:
-      EmitInstruction("nop", "", cmt.str());
-      break;
+	case opNop:
+		EmitInstruction("nop", "", cmt.str());
+		break;
 
-
-    default:
-      EmitInstruction("# ???", "not implemented", cmt.str());
-  }
+	default:
+		EmitInstruction("# ???", "not implemented", cmt.str());
+	}
 }
 
 void CBackendAMD64::EmitInstruction(string mnemonic, string args, string comment)
@@ -404,7 +542,7 @@ void CBackendAMD64::Load(EAMD64Register dst, CTacAddr *src, string comment)
 {
   assert(src != NULL);
   int size = OperandSize(src);
-  string mnm = "mov", mod, reg = Reg(dst); //, size);
+  string mnm = "mov", mod, reg = Reg(dst, size);
 
   // set operator modifier based on operand size
   switch (size) {
@@ -440,12 +578,41 @@ void CBackendAMD64::Store(CTac *dst, EAMD64Register src, string comment)
 
 string CBackendAMD64::Operand(const CTac *op)
 {
-  //
-  // TODO
-  // return a string representing op
-  // Hint: references (op of type CTacReference) require special care
+	// TODO
+	// return a string representing op
+	string operand = "?";
 
-  return "?";
+	// Case constant
+	const auto *opCst = dynamic_cast<const CTacConst*>(op);
+	if (opCst) {
+		operand = "$" + to_string(opCst->GetValue());
+		return operand;
+	}
+
+	// Case name
+	const auto *opName = dynamic_cast<const CTacName*>(op);
+	if (opName)
+	{
+		const CSymbol* symbol = opName->GetSymbol();
+		ESymbolType symbolType = symbol->GetSymbolType();
+		if (symbolType == stGlobal || symbolType == stProcedure){
+			operand = symbol->GetName() + "(" + "%rip" + ")";
+		}
+		else{
+			// It is segfaulting, we need to implement the location obviousy
+			//operand = to_string(symbol->GetLocation()->GetOffset()) + "(%" + to_string(symbol->GetLocation()->GetLocation()) + ")";
+			operand = "(%?)";
+		}
+		return operand;
+	}
+
+	// Hint: references (op of type CTacReference) require special care
+	const auto *opRef = dynamic_cast<const CTacName*>(op);
+	if (opRef){
+
+	}
+
+  	return operand;
 }
 
 string CBackendAMD64::Imm(long long value) const
@@ -482,12 +649,33 @@ string CBackendAMD64::Condition(EOperation cond) const
 
 int CBackendAMD64::OperandSize(CTac *t) const
 {
+	int size = 8;
+
+	// Case name
+	auto *name = dynamic_cast<CTacName*>(t);
+	if (name != NULL) {
+		size = name->GetSymbol()->GetDataType()->GetDataSize();
+		return size;
+	}
+
+	CTacReference *tRef = dynamic_cast<CTacReference*>(t);
+	if (tRef) {
+		const CType *dataType = tRef->GetDerefSymbol()->GetDataType();
+		// Hint: also here references (incl. references to pointers) and arrays need special care.
+		if (dataType->IsPointer() || dataType->IsArray()) {
+		}
+		else
+			size = dataType->GetDataSize();
+	}
+
+	return size;
+
+
   // TODO
   // compute the size for operand t of type CTacName
-  // Hint: also here references (incl. references to pointers) and arrays need special care.
   //       Compare your output to that of the reference implementation if you are unsure.
   //
-  return 0;
+  return size;
 }
 
 string CBackendAMD64::Location(const CSymbol *s, long long ofs)
@@ -505,33 +693,60 @@ string CBackendAMD64::Reg(EAMD64Register reg, int size)
 	// return the full register name for base register @a base and a given data @a size
 	// Hint: this is a simple lookup into EAMD64RegisterName
 	//
-
+	string regname = "%";
 	switch (size)
 	{
+	case 1:
+	{
+		regname += EAMD64RegisterName[reg].n8;
+		break;
+	}
+	case 2:
+	{
+		regname += EAMD64RegisterName[reg].n16;
+		break;
+	}
+	case 4:
+	{
+		regname += EAMD64RegisterName[reg].n32;
+		break;
+	}
 	case 8:
 	{
-		return EAMD64RegisterName[reg].n8;
-	}
-	case 16:
-	{
-		return EAMD64RegisterName[reg].n16;
-	}
-	case 32:
-	{
-		return EAMD64RegisterName[reg].n32;
-	}
-	case 64:
-	{
-		return EAMD64RegisterName[reg].n64;
+		regname += EAMD64RegisterName[reg].n64;
+		break;
 	}
 	default:
 		return "%?";
 	}
+	return regname;
 }
 
 
 void CBackendAMD64::ComputeStackOffsets(CScope *scope, StackFrame &paf)
 {
+//	StackFrame paf = {
+//		.return_address   = 8,        // 1 * 8
+//		.saved_registers  = 0*8,      // number of saved registers * 8
+//		.padding          = 0,
+//		.saved_parameters = 0,
+//		.local_variables  = 0,
+//		.argument_build   = 0,
+//		.size             = 0
+//	};
+
+
+	for (const auto subscopes : scope->GetSymbolTable()->GetSymbols()){
+		if (subscopes->GetSymbolType() != stLocal) continue;
+		const CType* datatype = subscopes->GetDataType();
+		if (datatype->IsInt()){
+			paf.padding += 4;
+		}
+	}
+
+	paf.size = paf.return_address + paf.saved_registers + paf.padding + paf.saved_parameters + paf.local_variables + paf.argument_build;
+
+
   //
   // TODO
   // compute the location of local variables, temporaries and arguments on the stack
