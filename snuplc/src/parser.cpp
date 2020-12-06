@@ -125,25 +125,25 @@ void CParser::InitSymbolTable(CSymtab* st)
 	st->AddSymbol(f);
 
 	// print integer/longint value ‘v’ to stdout.
-	f = new CSymProc("WriteInt", tm->GetNull());
+	f = new CSymProc("WriteInt", tm->GetNull(), true);
 	f->AddParam(new CSymParam(0, "v", tm->GetInteger()));
 	st->AddSymbol(f);
-	f = new CSymProc("WriteLong", tm->GetNull());
+	f = new CSymProc("WriteLong", tm->GetNull(), true);
 	f->AddParam(new CSymParam(0, "v", tm->GetLongint()));
 	st->AddSymbol(f);
 
 	// write a single character to stdout.
-	f = new CSymProc("WriteChar", tm->GetNull());
+	f = new CSymProc("WriteChar", tm->GetNull(), true);
 	f->AddParam(new CSymParam(0, "c", tm->GetChar()));
 	st->AddSymbol(f);
 
 	// write string ‘string’ to stdout. No newline is added.
-	f = new CSymProc("WriteStr", tm->GetNull());
+	f = new CSymProc("WriteStr", tm->GetNull(), true);
 	f->AddParam(new CSymParam(0, "string", tm->GetChar()));
 	st->AddSymbol(f);
 
 	// write a newline sequence to stdout.
-	f = new CSymProc("WriteLn", tm->GetNull());
+	f = new CSymProc("WriteLn", tm->GetNull(), true);
 	st->AddSymbol(f);
 
 }
