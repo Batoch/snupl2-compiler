@@ -205,13 +205,13 @@ void CBackendAMD64::EmitScope(CScope *scope)
   ComputeStackOffsets(scope, paf);
 
 	_out << _ind << "# Stack organization:" << endl;
-	_out << _ind << "# " + _ind + "return_address :   " + to_string(paf.return_address) << endl;
-	_out << _ind << "# " + _ind + "saved_registers :  " + to_string(paf.saved_registers) << endl;
-	_out << _ind << "# " + _ind + "padding :          " + to_string(paf.padding) << endl;
-	_out << _ind << "# " + _ind + "saved_parameters : " + to_string(paf.saved_parameters) << endl;
-	_out << _ind << "# " + _ind + "local_variables :  " + to_string(paf.local_variables) << endl;
-	_out << _ind << "# " + _ind + "argument_build :   " + to_string(paf.argument_build) << endl;
-	_out << _ind << "# " + _ind + "total size :       " + to_string(paf.size) << endl;
+	_out << _ind << "# " + _ind + "return_address :   " + to_string(paf.return_address) 	<< endl;
+	_out << _ind << "# " + _ind + "saved_registers :  " + to_string(paf.saved_registers) 	<< endl;
+	_out << _ind << "# " + _ind + "padding :          " + to_string(paf.padding) 			<< endl;
+	_out << _ind << "# " + _ind + "saved_parameters : " + to_string(paf.saved_parameters) 	<< endl;
+	_out << _ind << "# " + _ind + "local_variables :  " + to_string(paf.local_variables) 	<< endl;
+	_out << _ind << "# " + _ind + "argument_build :   " + to_string(paf.argument_build) 	<< endl;
+	_out << _ind << "# " + _ind + "total size :       " + to_string(paf.size) 				<< endl;
 	_out << endl;
 	_out << endl;
 
@@ -219,7 +219,7 @@ void CBackendAMD64::EmitScope(CScope *scope)
   	// 2. emit function prologue
 	_out << _ind << "# prologue" << endl;
 
-	//    - store saved registrs
+	//    - store saved registers
 	_out << _ind << "# save callee saved registers" << endl;
 	EmitInstruction("pushq", "%rbx");
 	EmitInstruction("pushq", "%rbp");
