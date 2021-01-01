@@ -1,5 +1,7 @@
 # Term Project: Building a Compiler for SnuPL/2
 
+(Please don't copy this code, it's not of good quality, you should do it better and propose a pull request)
+
 In this term project, we implemented a simple compiler for the SnuPL/2 language. 
 Our compiler compile SnuPL/2 source code to 64-bit assembly code.
 
@@ -38,13 +40,3 @@ Refer to the [PDF description](/specification/4.Intermediate.Code.Generation.pdf
 ## Phase 5: Code Generation
 
 Refer to the [PDF description](/specification/5.Code.Generation.pdf).
-
-
-
-### Submission
-
-Push your submission to our Gitlab server at https://teaching.csap.snu.ac.kr/ and tag it with "Submission-Phase-2".  If you discover a bug and push an improved version, delete the tag on the old commit and re-create it on the commit that we are to evaluate.
-
-The date of the commit counts as the submission date. If you push changes after the official deadline, let the TAs know by email.
-
-
