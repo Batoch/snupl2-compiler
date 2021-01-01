@@ -1,7 +1,7 @@
 # Term Project: Building a Compiler for SnuPL/2
 
-In this term project, we are going to implement a simple compiler for the SnuPL/2 language. 
-Our compiler will compile SnuPL/2 source code to 64-bit assembly code.
+In this term project, we implemented a simple compiler for the SnuPL/2 language. 
+Our compiler compile SnuPL/2 source code to 64-bit assembly code.
 
 SnuPL/2 is an imperative procedural language closely related to the [Oberon programming language](https://people.inf.ethz.ch/wirth/Oberon/index.html), one of the many languages developed by Prof. Niklaus Wirth. 
 SnuPL/2 does not support object-orientation and the only composite data type supported are arrays. 
@@ -26,6 +26,18 @@ Refer to the [PDF description](/specification/1.Scanning.pdf).
 ## Phase 2: Scanning
 
 Refer to the [PDF description](/specification/2.Parsing.pdf).
+
+## Phase 3: Semantic Analysis
+
+Refer to the [PDF description](/specification/3.Semantic.Analysis.pdf.pdf).
+
+## Phase 4: Intermediate Code Generation
+
+Refer to the [PDF description](/specification/4.Intermediate.Code.Generation.pdf).
+
+## Phase 5: Code Generation
+
+Refer to the [PDF description](/specification/5.Code.Generation.pdf).
 
 
 
